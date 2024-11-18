@@ -32,7 +32,7 @@
                     <configuration>
                         <archive>
                             <manifest>
-                                <mainClass>com.thiago.producer.App</mainClass>
+                                <mainClass>com.thiago.consumer.App</mainClass>
                             </manifest>
                         </archive>
                         <descriptorRefs>

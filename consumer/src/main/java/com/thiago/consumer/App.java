@@ -2,25 +2,26 @@ package com.thiago.consumer;
 
 import com.thiago.producer.EngineTemperatureSensor;
 import org.eclipse.paho.mqttv5.client.*;
-import java.util.Arrays;
+import org.eclipse.paho.mqttv5.common.MqttSubscription;
+
 import java.util.UUID;
-import java.util.concurrent.*;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        CountDownLatch receivedSignal = new CountDownLatch(10);
         String subscriberId = UUID.randomUUID().toString();
-        IMqttClient subscriber = new MqttClient("tcp://localhost:1883", subscriberId);
-        MqttConnectionOptions options = new MqttConnectionOptions();
-        options.setAutomaticReconnect(true);
-        options.setConnectionTimeout(10);
+        var uri = "tcp://localhost:1883";
+        var subscriber = new MqttClient(uri, subscriberId);
+        var options = new MqttConnectionOptions();
         subscriber.connect(options);
-        subscriber.subscribe(EngineTemperatureSensor.TOPIC, 0, (topic, msg) -> {
-            byte[] payload = msg.getPayload();
-            // ... payload handling omitted
-            System.out.println(Arrays.toString(payload));
-            receivedSignal.countDown();
-        });
-        receivedSignal.await(1, TimeUnit.MINUTES);
+        var topic = EngineTemperatureSensor.TOPIC;
+        var mqttSubscrition = new MqttSubscription(topic, 0);
+        var subs = new MqttSubscription[] { mqttSubscrition };
+        IMqttMessageListener listener = (mTopic, mContent) -> {
+            byte[] payload = mContent.getPayload();
+            System.out.println("Received message: " + new String(payload));
+        };
+        var listeners = new IMqttMessageListener[] { listener };
+        IMqttToken token = subscriber.subscribe(subs, listeners);
+        token.waitForCompletion();
     }
 }

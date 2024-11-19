@@ -1,7 +1,6 @@
 package com.thiago.producer;
 
-import org.eclipse.paho.mqttv5.client.*;
-import org.eclipse.paho.mqttv5.common.MqttMessage;
+import org.eclipse.paho.client.mqttv3.*;
 
 import java.util.Random;
 import java.util.concurrent.Callable;
@@ -31,7 +30,7 @@ public class EngineTemperatureSensor implements Callable<Void> {
     }
 
     private MqttMessage readEngineTemp() {
-        double temp = 80 + rnd.nextDouble() * 20.0;
+        final var temp = 80 + rnd.nextDouble() * 20.0;
         byte[] payload = String.format("T:%04.2f", temp)
                 .getBytes();
         return new MqttMessage(payload);

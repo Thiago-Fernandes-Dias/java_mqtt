@@ -1,0 +1,26 @@
+services:
+  consumer:
+    build:
+      dockerfile: Dockerfile
+      target: consumer-run
+    container_name: consumer
+    depends_on:
+      - mqtt_server
+    networks:
+      - mqtt
+  producer:
+    build:
+      dockerfile: Dockerfile
+      target: producer-run
+    container_name: producer
+    depends_on:
+      - mqtt_server
+    networks:
+      - mqtt
+  mqtt_server:
+    image: ncarlier/mqtt:latest
+    networks:
+      - mqtt
+networks:
+  mqtt:
+    driver: bridge

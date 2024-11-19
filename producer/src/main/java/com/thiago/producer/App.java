@@ -1,24 +1,23 @@
 package com.thiago.producer;
 
-import org.eclipse.paho.mqttv5.client.*;
+import org.eclipse.paho.client.mqttv3.*;
 
 import java.util.UUID;
 
-/**
- * Hello world!
- */
 public class App {
     public static void main(String[] args) throws Exception {
-        String publisherId = UUID.randomUUID().toString();
-        MqttClient client = new MqttClient("tcp://localhost:1883", publisherId);
-        MqttConnectionOptions options = new MqttConnectionOptions();
+        final String publisherId = UUID.randomUUID().toString();
+        final var client = new MqttClient("tcp://mqtt_server:1883", publisherId);
+        final var options = new MqttConnectOptions();
         options.setAutomaticReconnect(true);
         options.setConnectionTimeout(10);
         client.connect(options);
-        var f = new EngineTemperatureSensor(client);
-        while (true) {
+        final var f = new EngineTemperatureSensor(client);
+        for (int i = 0; i < 10; i++) {
             f.call();
             Thread.sleep(1000);
         }
+        client.disconnect();
+        client.close();
     }
 }
